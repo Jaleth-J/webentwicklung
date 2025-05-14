@@ -12,6 +12,7 @@ window.addEventListener("DOMContentLoaded", () => {
       <button class="button small" onclick="location.href='index.html'">🏠 Startseite</button>
     </div>
   `;
+  
 });
 
 
