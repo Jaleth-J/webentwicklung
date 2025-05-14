@@ -6,7 +6,7 @@ let score = 0;
 function updateImage() {
   const img = document.getElementById("car-image");
   img.src = images[currentIndex];
-  img.style.filter = "none"; // kein Blur
+  img.style.filter = "none"; 
 }
 
 function loadScore() {
