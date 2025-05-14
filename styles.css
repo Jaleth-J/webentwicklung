@@ -1,0 +1,157 @@
+:root {
+  --bg-color: #1a1a1a;
+  --accent: #ff4e28;
+  --text: #f0f0f0;
+  --box: #2a2a2a;
+}
+
+:root.light-mode {
+  --bg-color: #f8f8f8;
+  --accent: #ff4e28;
+  --text: #1a1a1a;
+  --box: #e0e0e0;
+}
+
+
+
+
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-color);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-size: 1.2em;
+}
+
+header, footer {
+  background: var(--box);
+  padding: 1% 5%;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5%;
+}
+
+.button {
+  background: var(--accent);
+  border: none;
+  padding: 2% 6%;
+  margin: 1% auto;
+  color: #fff;
+  font-size: 1.2em;
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 78, 40, 0.5);
+}
+
+.box {
+  background: var(--box);
+  padding: 5% 7%;
+  border-radius: 20px;
+  max-width: 800px;
+  width: 90%;
+  margin: 3% auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  text-align: center;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .button {
+    font-size: 1em;
+    padding: 4% 7%;
+  }
+  main {
+    padding: 10%;
+  }
+  .box {
+    padding: 8% 5%;
+  }
+}
+.button.small {
+  font-size: 0.8em;
+  padding: 0.4em 1.2em;
+  border-radius: 6px;
+  box-shadow: none;
+  margin-left: auto;
+}
+.right {
+  margin-left: auto;
+}
+.login-top {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.8em;
+  padding: 0.4em 1em;
+  border-radius: 6px;
+  box-shadow: none;
+  z-index: 1000;
+}
+.login-box {
+  position: absolute;
+  top: 3.5rem;
+  right: 1rem;
+  background-color: var(--box);
+  border: 1px solid var(--accent);
+  padding: 1em;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 1000;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.hidden {
+  display: none;
+}
+
+.login-box input {
+  padding: 0.4em;
+  border: none;
+  border-radius: 4px;
+}
+#car-image {
+  max-width: 100%;
+  max-height: 300px;
+  margin-bottom: 1em;
+  transition: filter 0.3s ease;
+}
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.box input,
+.box button {
+  margin-top: 1em;
+  width: 80%;
+  max-width: 300px;
+}
+    

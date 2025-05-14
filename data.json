@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "name": "Max Mustermann",
+      "password": "1234",
+      "scores": {
+        "leicht": 2,
+        "schwer": 1
+      }
+    }
+  ]
+}
