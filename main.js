@@ -8,15 +8,13 @@ window.addEventListener("DOMContentLoaded", () => {
   `;
   document.getElementById("footer").innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-      <span>© 2025 Autorate Game</span>
+      <span>© 2025</span>
       <button class="button small" onclick="location.href='index.html'">🏠 Startseite</button>
     </div>
   `;
 });
 
-function toggleLogin() {
-  alert("Login-Popup würde hier erscheinen.");
-}
+
 
 
   
@@ -24,7 +22,7 @@ function toggleLogin() {
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("header").innerHTML = `
     <div class="header-container">
-      <h1>🚗 Autorate</h1>
+      <h1>Auto-Marken-Raten</h1>
       <button class="button small login-top" onclick="toggleLoginBox()">Login</button>
     </div>
     <div id="login-box" class="login-box hidden">
@@ -119,7 +117,7 @@ function deleteUser() {
   localStorage.setItem("users", JSON.stringify(users));
   localStorage.removeItem("currentUser");
 
-  // Login-Feld zurücksetzen
+  
   const box = document.getElementById("login-box");
   box.innerHTML = `
     <label for="username">Benutzer:</label>
