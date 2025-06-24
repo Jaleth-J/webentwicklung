@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <script src="main.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rangliste</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #121212;
+      color: white;
+    }
+     footer {
+  background: var(--box);
+  padding: 1% 5%;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+    main {
+      max-width: 1000px;
+      margin: 2em auto;
+      padding: 1em;
+      background: #1a1a1a;
+      border-radius: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .level-wrapper {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .level-column {
+      flex: 1;
+      min-width: 300px;
+      background: #262626;
+      padding: 1em;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 78, 40, 0.2);
+    }
+
+    .pokalgruppe {
+      margin-bottom: 2em;
+      padding: 1em;
+      background-color: rgba(255,255,255,0.05);
+      border-radius: 12px;
+    }
+
+    .pokalgruppe img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .pokalgruppe h3 {
+      margin: 0.5em 0;
+    }
+
+    .platzliste {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      margin-top: 1em;
+    }
+
+    .platzliste div {
+      border-bottom: 1px solid #333;
+      padding: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  
+  <main>
+    <h1>🏆 Rangliste</h1>
+    <div class="level-wrapper">
+      <div class="level-column" id="level1">
+        <h2>Level 1</h2>
+      </div>
+      <div class="level-column" id="level2">
+        <h2>Level 2</h2>
+      </div>
+    </div>
+  </main>
+  
+ 
+  <script>
+    function pokalStufe(score) {
+      if (score >= 9) return 'unreal';
+      if (score >= 7) return 'gold';
+      if (score >= 5) return 'silber';
+      if (score >= 3) return 'eisen';
+      return 'bronze';
+    }
+
+    function pokalName(stufe) {
+      return {
+        bronze: 'Holz',
+        eisen: 'Eisen',
+        silber: 'Silber',
+        gold: 'Gold',
+        unreal: 'Unreal'
+      }[stufe];
+    }
+
+    function ladeLeaderboard(level, daten) {
+      const gruppen = {
+        bronze: [],
+        eisen: [],
+        silber: [],
+        gold: [],
+        unreal: []
+      };
+
+      daten.forEach(player => {
+        const score = player.highscore?.[`level${level}`] || 0;
+        const stufe = pokalStufe(score);
+        gruppen[stufe].push({ name: player.username, score });
+      });
+
+      const container = document.getElementById(`level${level}`);
+
+      ['bronze', 'eisen', 'silber', 'gold', 'unreal'].forEach(stufe => {
+        const eintraege = gruppen[stufe];
+        if (eintraege.length === 0) return;
+
+        const anzeigeAnzahl = stufe === 'unreal' ? 1 : 3;
+        const top = eintraege.slice(0, anzeigeAnzahl);
+
+        const section = document.createElement('section');
+        section.className = 'pokalgruppe';
+
+        section.innerHTML = `
+          <img src="bilder/${stufe}.png" alt="${stufe}">
+          <h3>${pokalName(stufe)}</h3>
+          <div class="platzliste">
+            ${top.map((p, i) => `<div>${i + 1}. ${p.name} – ${p.score} Punkte</div>`).join('')}
+          </div>
+        `;
+
+        container.appendChild(section);
+      });
+    }
+
+    // Level 1
+    fetch('http://localhost:3000/leaderboard/level1')
+      .then(res => res.json())
+      .then(data => ladeLeaderboard(1, data));
+
+    // Level 2
+    fetch('http://localhost:3000/leaderboard/level2')
+      .then(res => res.json())
+      .then(data => ladeLeaderboard(2, data));
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("footer").innerHTML = `
+      <div class="footer-container">
+        <span>© 2025</span>
+        <button class="button small" onclick="location.href='index.html'">🏠 Startseite</button>
+      </div>
+    `;
+  });
+</script>
+<footer id="footer"></footer>
+</body>
+</html>

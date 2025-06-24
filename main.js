@@ -1,13 +1,7 @@
-
-
-
-
-
-  
-  
 // main.js
 
 window.addEventListener("DOMContentLoaded", () => {
+  // Header + Login-Box einfügen
   document.getElementById("header").innerHTML = `
     <div class="header-container">
       <h1>Auto-Marken-Raten</h1>
@@ -21,10 +15,41 @@ window.addEventListener("DOMContentLoaded", () => {
       <button class="button" onclick="submitLogin()">Anmelden</button>
       <button class="button small" onclick="handleRegister()">Registrieren</button>
       <button class="button small" onclick="toggleTheme()">🌑</button>
+      <div id="delete-user-container" style="display:none; margin-top:10px;">
+        <button class="button small" id="delete-user-btn">🗑 Benutzer löschen</button>
+      </div>
       <p id="login-message"></p>
     </div>
   `;
 
+  // Wenn bereits eingeloggt, zeige den Button zum Löschen
+  const username = localStorage.getItem("username");
+  if (username) {
+    const deleteContainer = document.getElementById("delete-user-container");
+    const deleteBtn = document.getElementById("delete-user-btn");
+    deleteContainer.style.display = "block";
+
+    deleteBtn.addEventListener("click", async () => {
+      if (!confirm("Willst du deinen Account wirklich löschen?")) return;
+
+      const res = await fetch("http://localhost:3000/delete-user", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert("Benutzer wurde gelöscht.");
+        localStorage.clear();
+        location.href = "index.html";
+      } else {
+        alert("Fehler beim Löschen.");
+      }
+    });
+  }
+
+  // Footer einfügen
   document.getElementById("footer").innerHTML = `
     <div class="footer-container">
       <span>© 2025</span>
@@ -111,26 +136,6 @@ async function updateScore(level, newScore) {
   }
 }
 
-async function deleteUser() {
-  const username = localStorage.getItem("username");
-  if (!username) return;
-
-  const res = await fetch("http://localhost:3000/delete", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    alert("Konto gelöscht.");
-    localStorage.clear();
-    location.href = "index.html";
-  } else {
-    alert("Löschen fehlgeschlagen.");
-  }
-}
-
 function toggleTheme() {
   const root = document.documentElement;
   if (root.classList.contains("light-mode")) {
@@ -142,8 +147,35 @@ function toggleTheme() {
   }
 }
 
-// Theme beim Start anwenden
+// Theme anwenden
 const savedTheme = localStorage.getItem("theme") || "dark";
 if (savedTheme === "light") {
   document.documentElement.classList.add("light-mode");
 }
+document.getElementById('delete-user-btn')?.addEventListener('click', async () => {
+  const username = localStorage.getItem('username');
+  if (!username) return alert('Kein Benutzername gespeichert.');
+
+  const sicher = confirm('Willst du deinen Benutzer wirklich löschen?');
+  if (!sicher) return;
+
+  try {
+    const res = await fetch('http://localhost:3000/delete-user', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert('Benutzer gelöscht.');
+      localStorage.clear();
+      location.reload();
+    } else {
+      alert('Fehler: ' + data.message);
+    }
+  } catch (err) {
+    alert('Fehler beim Löschen: ' + err.message);
+  }
+});
+

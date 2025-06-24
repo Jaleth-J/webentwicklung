@@ -7,11 +7,13 @@ const images = [
 const answers = ["ferrari", "alfa romeo", "bugatti"];
 let currentIndex = Math.floor(Math.random() * images.length);
 let score = 0;
+let attempt = 0;
 
 function updateImage() {
   const img = document.getElementById("car-image");
   img.src = images[currentIndex];
-  img.style.filter = "none";
+  const blur = Math.max(0, 30 - attempt * 6); // 30 → 24 → 18 → 12 → 6 → 0
+  img.style.filter = `grayscale(100%) blur(${blur}px)`;
 }
 
 function loadScore() {
@@ -34,14 +36,21 @@ function checkAnswer() {
     saveScoreToLocal(score);
     nextImage();
   } else {
-    alert("Falsch!");
-    score = 0;
-    saveScoreToLocal(score);
+    attempt++;
+    if (attempt >= 5) {
+      alert("Falsch! Die richtige Antwort war: " + correct);
+      score = 0;
+      saveScoreToLocal(score);
+      nextImage();
+    } else {
+      updateImage();
+    }
   }
 }
 
 function nextImage() {
   currentIndex = (currentIndex + 1) % images.length;
+  attempt = 0;
   updateImage();
   document.getElementById("brand-input").value = "";
 }
