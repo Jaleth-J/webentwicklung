@@ -25,8 +25,8 @@ function checkGuess() {
   if (guess === correct) {
     score++;
     alert("Richtig!");
-    saveScoreToServer(score);  // Backend
-    saveScoreToLocal(score);  // localStorage
+    saveScoreToServer(score);  
+    saveScoreToLocal(score);  
     nextImage();
   } else {
     alert("Falsch!");

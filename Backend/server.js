@@ -11,19 +11,19 @@ const dbName = 'autoratespiel';
 app.use(cors());
 app.use(express.json());
 
-// Verbindung beim Start öffnen
+
 let db;
 client.connect().then(() => {
   db = client.db(dbName);
   console.log("✅ Verbunden mit MongoDB");
 });
 
-// Test-Route
+
 app.get('/', (req, res) => {
   res.send('✅ Backend läuft & MongoDB ist verbunden');
 });
 
-// Registrierung
+
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -39,7 +39,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login
+
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -53,7 +53,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Highscore speichern
+
 app.post('/saveScore', async (req, res) => {
   const { username, level, score } = req.body;
   try {
@@ -89,7 +89,7 @@ app.delete('/delete-user', async (req, res) => {
     res.status(500).json({ success: false, message: 'Interner Serverfehler.' });
   }
 });
-// Leaderboard
+
 app.get('/leaderboard/:level', async (req, res) => {
   const level = req.params.level;
   try {

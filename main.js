@@ -1,7 +1,7 @@
-// main.js
+
 
 window.addEventListener("DOMContentLoaded", () => {
-  // Header + Login-Box einfügen
+  
   document.getElementById("header").innerHTML = `
     <div class="header-container">
       <h1>Auto-Marken-Raten</h1>
@@ -22,7 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
-  // Wenn bereits eingeloggt, zeige den Button zum Löschen
+
   const username = localStorage.getItem("username");
   if (username) {
     const deleteContainer = document.getElementById("delete-user-container");
@@ -49,7 +49,6 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Footer einfügen
   document.getElementById("footer").innerHTML = `
     <div class="footer-container">
       <span>© 2025</span>
@@ -147,7 +146,7 @@ function toggleTheme() {
   }
 }
 
-// Theme anwenden
+
 const savedTheme = localStorage.getItem("theme") || "dark";
 if (savedTheme === "light") {
   document.documentElement.classList.add("light-mode");

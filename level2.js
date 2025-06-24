@@ -12,7 +12,7 @@ let attempt = 0;
 function updateImage() {
   const img = document.getElementById("car-image");
   img.src = images[currentIndex];
-  const blur = Math.max(0, 30 - attempt * 6); // 30 → 24 → 18 → 12 → 6 → 0
+  const blur = Math.max(0, 30 - attempt * 6); 
   img.style.filter = `grayscale(100%) blur(${blur}px)`;
 }
 
