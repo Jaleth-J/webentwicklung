@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header id="header">Login</header>
+  <main class="box">
+    <h2>Einloggen</h2>
+    <input id="username" type="text" placeholder="Benutzername" />
+    <input id="password" type="password" placeholder="Passwort" />
+  
+    <button class="button" onclick="handleLogin()">Einloggen</button>
+  
+    <hr style="margin: 2em 0; width: 100%; border: none; border-top: 1px solid #aaa;">
+  
+    <h3>Noch kein Konto?</h3>
+    <p style="margin-top: 0.2em;">Du kannst dich hier direkt registrieren:</p>
+    <button class="button small" onclick="handleRegister()">Neu registrieren</button>
+  </main>
+  
+  <script>
+    async function handleLogin() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+  
+      try {
+        const res = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+  
+        const contentType = res.headers.get('content-type');
+        if (!res.ok || !contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          throw new Error('Serverfehler:\n' + text);
+        }
+  
+        const data = await res.json();
+  
+        if (data.success) {
+          localStorage.setItem('username', username);
+          localStorage.setItem('highscore', JSON.stringify(data.highscore));
+          alert('Login erfolgreich!');
+          window.location.href = 'modus.html';
+        } else {
+          alert('Login fehlgeschlagen: ' + data.message);
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  
+    async function handleRegister() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+  
+      try {
+        const res = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+  
+        const contentType = res.headers.get('content-type');
+        if (!res.ok || !contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          throw new Error('Serverfehler:\n' + text);
+        }
+  
+        const data = await res.json();
+  
+        if (data.success) {
+          alert('Registrierung erfolgreich. Jetzt kannst du dich einloggen.');
+        } else {
+          alert('Fehler: ' + data.message);
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  </script>
+  
+</body>
+</html>

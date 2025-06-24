@@ -1,62 +1,72 @@
-const images = ["bilder/farrari.png", "bilder/alfa-romeo-logo.png", "bilder/bugatti-logo.png"];
-const answers = ["farrari", "alfa-romeo", "bugatti"];
+const images = [
+  "bilder/farrari.png",
+  "bilder/alfa-romeo-logo.png",
+  "bilder/bugatti-logo.png"
+];
+
+const answers = ["ferrari", "alfa romeo", "bugatti"];
 let currentIndex = Math.floor(Math.random() * images.length);
-let attempts = 0;
 let score = 0;
 
 function updateImage() {
   const img = document.getElementById("car-image");
   img.src = images[currentIndex];
-  let blur = Math.max(20 - attempts * 5, 0);
-  img.style.filter = "blur(" + blur + "px)";
+  img.style.filter = "none";
 }
 
 function loadScore() {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
-  if (user) {
-    score = user.scores.schwer || 0;
+  const saved = localStorage.getItem("highscore");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    score = parsed.level2 || 0;
     document.getElementById("score").textContent = score;
   }
 }
 
-function saveScore() {
-  let users = JSON.parse(localStorage.getItem("users"));
-  let current = JSON.parse(localStorage.getItem("currentUser"));
-
-  users = users.map(u => {
-    if (u.name === current.name) {
-      u.scores.schwer = score;
-      current.scores.schwer = score;
-    }
-    return u;
-  });
-
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("currentUser", JSON.stringify(current));
-  document.getElementById("score").textContent = score;
-}
-
 function checkAnswer() {
-  const input = document.getElementById("brand-input").value.toLowerCase().trim();
+  const guess = document.getElementById("brand-input").value.toLowerCase().trim();
   const correct = answers[currentIndex];
 
-  if (input === correct) {
+  if (guess === correct) {
     score++;
     alert("Richtig!");
-    saveScore();
+    saveScoreToServer(score);
+    saveScoreToLocal(score);
     nextImage();
   } else {
     alert("Falsch!");
-    attempts++;
-    updateImage();
+    score = 0;
+    saveScoreToLocal(score);
   }
 }
 
 function nextImage() {
   currentIndex = (currentIndex + 1) % images.length;
-  attempts = 0;
   updateImage();
   document.getElementById("brand-input").value = "";
+}
+
+function saveScoreToLocal(score) {
+  const highscore = JSON.parse(localStorage.getItem("highscore")) || {};
+  highscore.level2 = score;
+  localStorage.setItem("highscore", JSON.stringify(highscore));
+  document.getElementById("score").textContent = score;
+}
+
+async function saveScoreToServer(score) {
+  const username = localStorage.getItem("username");
+  if (!username) return;
+
+  const res = await fetch("http://localhost:3000/saveScore", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, level: "level2", score })
+  });
+
+  const data = await res.json();
+  if (!data.success) {
+    console.error("Fehler beim Score-Speichern im Backend");
+  }
 }
 
 window.addEventListener("DOMContentLoaded", () => {

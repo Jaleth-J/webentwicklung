@@ -1,25 +1,12 @@
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("header").innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center">
-      
-      <button class="button small login-top" onclick="location.href='login.html'">Login</button>
-      <button class="button small" onclick="toggleTheme()">🌓</button>
-    </div>
-  `;
-  document.getElementById("footer").innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-      <span>© 2025</span>
-      <button class="button small" onclick="location.href='index.html'">🏠 Startseite</button>
-    </div>
-  `;
-  
-});
+
 
 
 
 
   
   
+// main.js
+
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("header").innerHTML = `
     <div class="header-container">
@@ -32,7 +19,8 @@ window.addEventListener("DOMContentLoaded", () => {
       <label for="password">Passwort:</label>
       <input type="password" id="password" placeholder="z.B. 1234" />
       <button class="button" onclick="submitLogin()">Anmelden</button>
-       <button class="button small" onclick="toggleTheme()">🌓</button>
+      <button class="button small" onclick="handleRegister()">Registrieren</button>
+      <button class="button small" onclick="toggleTheme()">🌑</button>
       <p id="login-message"></p>
     </div>
   `;
@@ -43,19 +31,6 @@ window.addEventListener("DOMContentLoaded", () => {
       <button class="button small" onclick="location.href='index.html'">🏠 Startseite</button>
     </div>
   `;
-
-  
-  if (!localStorage.getItem("users")) {
-    const defaultUser = [{
-      name: "max",
-      password: "1234",
-      scores: {
-        leicht: 0,
-        schwer: 0
-      }
-    }];
-    localStorage.setItem("users", JSON.stringify(defaultUser));
-  }
 });
 
 function toggleLoginBox() {
@@ -63,77 +38,99 @@ function toggleLoginBox() {
   box.classList.toggle("hidden");
 }
 
-function submitLogin() {
-  const uname = document.getElementById("username").value.toLowerCase();
-  const pw = document.getElementById("password").value;
-  const users = JSON.parse(localStorage.getItem("users"));
-  const user = users.find(u => u.name === uname && u.password === pw);
-
-  const box = document.getElementById("login-box");
+async function submitLogin() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
   const msg = document.getElementById("login-message");
 
-  if (user) {
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    msg.textContent = "Login erfolgreich!";
-    msg.style.color = "limegreen";
+  try {
+    const res = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
 
-   
-    box.innerHTML = `
-      <label for="usernameEdit">Benutzername:</label>
-      <input type="text" id="usernameEdit" value="${user.name}" />
-      <label for="passwordEdit">Passwort:</label>
-      <input type="password" id="passwordEdit" value="${user.password}" />
-      <button class="button" onclick="editUser()">Bearbeiten</button>
-      <button class="button" onclick="deleteUser()">Löschen</button>
-      <p id="edit-message"></p>
-    `;
-  } else {
-    msg.textContent = "Benutzername oder Passwort falsch.";
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("username", username);
+      localStorage.setItem("highscore", JSON.stringify(data.highscore));
+      msg.textContent = "Login erfolgreich!";
+      msg.style.color = "limegreen";
+      window.location.href = "modus.html";
+    } else {
+      msg.textContent = "Login fehlgeschlagen: " + data.message;
+      msg.style.color = "red";
+    }
+  } catch (err) {
+    msg.textContent = "Serverfehler: " + err.message;
     msg.style.color = "red";
   }
 }
-function editUser() {
-  const newName = document.getElementById("usernameEdit").value.toLowerCase();
-  const newPw = document.getElementById("passwordEdit").value;
-  let users = JSON.parse(localStorage.getItem("users"));
-  let current = JSON.parse(localStorage.getItem("currentUser"));
 
-  users = users.map(u => {
-    if (u.name === current.name) {
-      return { ...u, name: newName, password: newPw };
+async function handleRegister() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("login-message");
+
+  try {
+    const res = await fetch('http://localhost:3000/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      msg.textContent = "Registrierung erfolgreich! Du kannst dich jetzt einloggen.";
+      msg.style.color = "limegreen";
+    } else {
+      msg.textContent = "Registrierung fehlgeschlagen: " + data.message;
+      msg.style.color = "red";
     }
-    return u;
+  } catch (err) {
+    msg.textContent = "Serverfehler: " + err.message;
+    msg.style.color = "red";
+  }
+}
+
+async function updateScore(level, newScore) {
+  const username = localStorage.getItem("username");
+  if (!username) return;
+
+  const res = await fetch("http://localhost:3000/update-score", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, level, score: newScore })
   });
 
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("currentUser", JSON.stringify({ ...current, name: newName, password: newPw }));
-
-  document.getElementById("edit-message").textContent = "Daten aktualisiert.";
+  const data = await res.json();
+  if (!data.success) {
+    console.error("Fehler beim Score-Speichern");
+  }
 }
-function deleteUser() {
-  let users = JSON.parse(localStorage.getItem("users"));
-  const current = JSON.parse(localStorage.getItem("currentUser"));
 
-  users = users.filter(u => u.name !== current.name);
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.removeItem("currentUser");
+async function deleteUser() {
+  const username = localStorage.getItem("username");
+  if (!username) return;
 
-  
-  const box = document.getElementById("login-box");
-  box.innerHTML = `
-    <label for="username">Benutzer:</label>
-    <input type="text" id="username" placeholder="z.B. max" />
-    <label for="password">Passwort:</label>
-    <input type="password" id="password" placeholder="z.B. 1234" />
-    <button class="button" onclick="submitLogin()">Anmelden</button>
-    <p id="login-message"></p>
-  `;
+  const res = await fetch("http://localhost:3000/delete", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert("Konto gelöscht.");
+    localStorage.clear();
+    location.href = "index.html";
+  } else {
+    alert("Löschen fehlgeschlagen.");
+  }
 }
-const savedTheme = localStorage.getItem("theme") || "dark";
-if (savedTheme === "light") {
-  document.documentElement.classList.add("light-mode");
 
-}
 function toggleTheme() {
   const root = document.documentElement;
   if (root.classList.contains("light-mode")) {
@@ -143,4 +140,10 @@ function toggleTheme() {
     root.classList.add("light-mode");
     localStorage.setItem("theme", "light");
   }
+}
+
+// Theme beim Start anwenden
+const savedTheme = localStorage.getItem("theme") || "dark";
+if (savedTheme === "light") {
+  document.documentElement.classList.add("light-mode");
 }

@@ -1,37 +1,21 @@
 const images = ["bilder/farrari.png", "bilder/alfa-romeo-logo.png", "bilder/bugatti-logo.png"];
-const answers = ["farrari", "alfa romeo", "bugatti"];
+const answers = ["ferrari", "alfa romeo", "bugatti"];
 let currentIndex = Math.floor(Math.random() * images.length);
 let score = 0;
 
 function updateImage() {
   const img = document.getElementById("car-image");
   img.src = images[currentIndex];
-  img.style.filter = "none"; 
+  img.style.filter = "none";
 }
 
 function loadScore() {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
-  if (user) {
-    score = user.scores.leicht || 0;
+  const saved = localStorage.getItem("highscore");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    score = parsed.level1 || 0;
     document.getElementById("score").textContent = score;
   }
-}
-
-function saveScore() {
-  let users = JSON.parse(localStorage.getItem("users"));
-  let current = JSON.parse(localStorage.getItem("currentUser"));
-
-  users = users.map(u => {
-    if (u.name === current.name) {
-      u.scores.leicht = score;
-      current.scores.leicht = score;
-    }
-    return u;
-  });
-
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("currentUser", JSON.stringify(current));
-  document.getElementById("score").textContent = score;
 }
 
 function checkGuess() {
@@ -41,12 +25,13 @@ function checkGuess() {
   if (guess === correct) {
     score++;
     alert("Richtig!");
-    saveScore();
+    saveScoreToServer(score);  // Backend
+    saveScoreToLocal(score);  // localStorage
     nextImage();
   } else {
     alert("Falsch!");
     score = 0;
-    saveScore();
+    saveScoreToLocal(score);
   }
 }
 
@@ -54,6 +39,29 @@ function nextImage() {
   currentIndex = (currentIndex + 1) % images.length;
   updateImage();
   document.getElementById("guess").value = "";
+}
+
+function saveScoreToLocal(score) {
+  const highscore = JSON.parse(localStorage.getItem("highscore")) || {};
+  highscore.level1 = score;
+  localStorage.setItem("highscore", JSON.stringify(highscore));
+  document.getElementById("score").textContent = score;
+}
+
+async function saveScoreToServer(score) {
+  const username = localStorage.getItem("username");
+  if (!username) return;
+
+  const res = await fetch("http://localhost:3000/saveScore", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, level: "level1", score })
+  });
+
+  const data = await res.json();
+  if (!data.success) {
+    console.error("Fehler beim Score-Speichern im Backend");
+  }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
