@@ -100,14 +100,14 @@
       if (score >= 9) return 'unreal';
       if (score >= 7) return 'gold';
       if (score >= 5) return 'silber';
-      if (score >= 3) return 'eisen';
-      return 'bronze';
+      if (score >= 3) return 'bronze';
+      return 'eisen';
     }
 
     function pokalName(stufe) {
       return {
-        bronze: 'Holz',
         eisen: 'Eisen',
+        bronze: 'Bronze',
         silber: 'Silber',
         gold: 'Gold',
         unreal: 'Unreal'
@@ -131,7 +131,7 @@
 
       const container = document.getElementById(`level${level}`);
 
-      ['bronze', 'eisen', 'silber', 'gold', 'unreal'].forEach(stufe => {
+      ['eisen', 'bronze', 'silber', 'gold', 'unreal'].forEach(stufe => {
         const eintraege = gruppen[stufe];
         if (eintraege.length === 0) return;
 
